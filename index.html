@@ -294,7 +294,7 @@ function pickCH(ma){
   $("f-mach").value=ma; $("chSug").classList.add("hidden");
   $("chInfo").classList.remove("hidden");
   $("chInfo").innerHTML=`<b>${selCH.ten}</b><br>GĐV: <b>${selCH.gdv||"—"}</b> · Miền: <b>${selCH.mien||"—"}</b><br>Tỉnh: ${selCH.tinh||"—"} · QLKV: ${selCH.qlkv||"—"}`;
-  liveValid();
+  autoDistance();
 }
 function acDen(v){
   v=v.trim().toLowerCase(); const box=$("denSug");
@@ -304,9 +304,23 @@ function acDen(v){
   box.innerHTML=hits.map(s=>`<div class="sg" onclick="pickDen('${s.ma}')"><span class="st">${s.ma}</span> · ${s.ten}<div class="sub">${s.gdv||"—"} · ${s.mien||"—"} · ${s.tinh||"—"}</div></div>`).join("");
   box.classList.remove("hidden");
 }
+let selDen=null;
 function pickDen(ma){
-  const s=STORELIST.find(x=>x.ma===ma); if(!s)return;
-  $("f-den").value=s.ten; $("denSug").classList.add("hidden");
+  selDen=STORELIST.find(x=>x.ma===ma); if(!selDen)return;
+  $("f-den").value=selDen.ten; $("denSug").classList.add("hidden");
+  autoDistance();
+}
+function hav(lat1,lng1,lat2,lng2){
+  const R=6371, rad=x=>x*Math.PI/180;
+  const dLat=rad(lat2-lat1), dLng=rad(lng2-lng1);
+  const a=Math.sin(dLat/2)**2 + Math.cos(rad(lat1))*Math.cos(rad(lat2))*Math.sin(dLng/2)**2;
+  return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*10)/10;
+}
+function autoDistance(){
+  if(selCH&&selDen&&selCH.lat!=null&&selCH.lng!=null&&selDen.lat!=null&&selDen.lng!=null){
+    $("f-km").value=hav(selCH.lat,selCH.lng,selDen.lat,selDen.lng);
+    liveValid();
+  }
 }
 
 // ================= VALID =================
@@ -377,7 +391,7 @@ function submitKB(){
   toast("✅ Đã gửi khai báo ("+ST_LABEL[status]+")");
   ["f-mach","f-manv","f-hoten","f-den","f-km","f-ngayctp","f-ngayks","f-ctp","f-ks","f-xang","f-ghichu","f-ngaydi","f-ngayve"].forEach(i=>$(i).value="");
   $("f-loai").value="Hỗ trợ NSO";$("f-tong").textContent="0 đ";
-  $("chInfo").classList.add("hidden");selCH=null;
+  $("chInfo").classList.add("hidden");selCH=null;selDen=null;
   $("validBox").className="valid-box pass hidden";
   renderAll();
 }
