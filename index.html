@@ -275,9 +275,8 @@ function acNV(v){
   box.classList.remove("hidden");
 }
 function pickNV(ma){
-  const u=findNV(ma); if(!u)return;
-  $("f-manv").value=ma; $("f-chucvu").value=u.chucVu;
-  $("nvSug").classList.add("hidden"); liveValid();
+  $("f-manv").value=ma;
+  $("nvSug").classList.add("hidden");
 }
 function acCH(v){
   v=v.trim().toLowerCase(); const box=$("chSug");
