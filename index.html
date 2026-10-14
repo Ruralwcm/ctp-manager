@@ -272,7 +272,7 @@ function acNV(v){
 }
 function pickNV(ma){
   const u=findNV(ma); if(!u)return;
-  $("f-manv").value=ma; $("f-hoten").value=u.ten; $("f-chucvu").value=u.chucVu;
+  $("f-manv").value=ma; $("f-chucvu").value=u.chucVu;
   $("nvSug").classList.add("hidden"); liveValid();
 }
 function acCH(v){
@@ -422,6 +422,11 @@ function renderPD(){
   else pool=pool.filter(r=>["cho_gdm","cho_gdv"].includes(r.trangThai));
   if(!pool.length){$("listPD").innerHTML='<div class="empty">Không có phiếu chờ duyệt.</div>';return}
   $("listPD").innerHTML=pool.map(r=>itemHtml(r,true)).join("");
+}
+</script>
+</body>
+</html>
+"");
 }
 </script>
 </body>
