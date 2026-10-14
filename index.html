@@ -142,14 +142,14 @@
         <div class="fld"><label>Ngày về</label><input id="f-ngayve" type="date" onchange="autoDays()"></div>
       </div>
       <div class="row">
-        <div class="fld"><label>Số ngày CTP (auto)</label><input id="f-ngayctp" readonly placeholder="về − đi + 1"></div>
-        <div class="fld"><label>Số ngày KS (auto)</label><input id="f-ngayks" readonly placeholder="về − đi"></div>
+        <div class="fld"><label>Số ngày CTP</label><input id="f-ngayctp" readonly placeholder="về − đi + 1"></div>
+        <div class="fld"><label>Số ngày KS</label><input id="f-ngayks" readonly placeholder="về − đi"></div>
       </div>
       <div class="row">
-        <div class="fld"><label>CTP / ngày (đ)</label><input id="f-ctp" type="number" placeholder="500000" oninput="calc()"></div>
-        <div class="fld"><label>KS / ngày (đ)</label><input id="f-ks" type="number" placeholder="300000" oninput="calc()"></div>
+        <div class="fld"><label>CTP (đ)</label><input id="f-ctp" type="text" inputmode="numeric" placeholder="500.000" oninput="moneyInput(this)"></div>
+        <div class="fld"><label>KS (đ)</label><input id="f-ks" type="text" inputmode="numeric" placeholder="300.000" oninput="moneyInput(this)"></div>
       </div>
-      <div class="fld"><label>Xăng / đi lại (đ)</label><input id="f-xang" type="number" placeholder="200000" oninput="calc()"></div>
+      <div class="fld"><label>Xăng / đi lại (đ)</label><input id="f-xang" type="text" inputmode="numeric" placeholder="200.000" oninput="moneyInput(this)"></div>
       <div class="fld"><label>Ghi chú</label><textarea id="f-ghichu" placeholder="Lý do, mục đích chuyến đi..."></textarea></div>
       <div class="fld" style="background:#f6f8fb;border-radius:10px;padding:10px 12px;font-size:13px">
         Tổng chi phí dự kiến: <b id="f-tong" style="color:var(--blue);font-size:16px">0 đ</b>
@@ -342,9 +342,13 @@ function autoDays(){
   } else {$("f-ngayctp").value="";$("f-ngayks").value="";}
   liveValid();
 }
-function calc(){const ctpNgay=+$("f-ctp").value||0,ksNgay=+$("f-ks").value||0,x=+$("f-xang").value||0;
-  const nctp=+$("f-ngayctp").value||0,nks=+$("f-ngayks").value||0;
-  const total=ctpNgay*nctp+ksNgay*nks+x;
+function moneyInput(el){
+  const v=el.value.replace(/[^\d]/g,'');
+  el.value=v?Number(v).toLocaleString('vi-VN'):'';
+  calc();
+}
+function money(el){return +((el.value||'').replace(/[^\d]/g,''))||0}
+function calc(){const total=money($("f-ctp"))+money($("f-ks"))+money($("f-xang"));
   $("f-tong").textContent=fmt(total);return total}
 
 // ================= SUBMIT =================
@@ -354,8 +358,7 @@ function submitKB(){
   if(!manv){toast("Bước 2: nhập Mã NV (người công tác)");return}
   const loai=$("f-loai").value, den=$("f-den").value.trim();
   const km=+$("f-km").value||0, soNgay=+$("f-ngayctp").value||0, soNgayKS=+$("f-ngayks").value||0;
-  const ctpNgay=+$("f-ctp").value||0, ksNgay=+$("f-ks").value||0, x=+$("f-xang").value||0;
-  const ctp=ctpNgay*soNgay, ks=ksNgay*soNgayKS, tong=calc();
+  const ctp=money($("f-ctp")), ks=money($("f-ks")), x=money($("f-xang")), tong=ctp+ks+x;
   if(!km){toast("Vui lòng nhập khoảng cách");return}
   if(!$("f-ngaydi").value||!$("f-ngayve").value){toast("Vui lòng nhập Ngày đi + Ngày về");return}
   if(!tong){toast("Vui lòng nhập chi phí");return}
