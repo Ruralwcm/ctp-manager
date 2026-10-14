@@ -235,7 +235,7 @@ function fmt(n){return (n||0).toLocaleString("vi-VN")+" đ"}
 function fmtTr(n){return n.toLocaleString("vi-VN",{maximumFractionDigits:1})}
 
 function findNV(ma){return NVDB.find(u=>u.maNV.toLowerCase()===String(ma).toLowerCase())}
-function gdvBudget(gdv){return GDV_BUDGET.find(g=>g.ten===gdv)}
+function gdvBudget(gdv){gdv=(gdv||'').normalize('NFC');return GDV_BUDGET.find(g=>g.ten.normalize('NFC')===gdv)}
 function usedBudget(gdv){return RECORDS.filter(r=>r.gdv===gdv&&r.trangThai==="done").reduce((s,r)=>s+(r.tong||0),0)}
 
 const ST_LABEL={cho_gdv:"Chờ GĐV",gdv_duyet:"GĐV duyệt",cho_gdm:"Chờ GĐM",done:"Hoàn tất",tu_choi:"Từ chối"};
