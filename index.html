@@ -13,7 +13,6 @@
   body{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:#1a1a1a;font-size:15px;line-height:1.45}
   .hidden{display:none!important}
 
-  /* Login */
   #login{max-width:420px;margin:8vh auto;padding:0 16px}
   .login-card{background:var(--card);border-radius:14px;padding:28px 20px;box-shadow:0 2px 14px rgba(0,0,0,.06)}
   .logo{text-align:center;margin-bottom:18px}
@@ -22,15 +21,13 @@
   label{display:block;font-size:12.5px;color:var(--muted);margin:12px 0 4px;font-weight:600}
   input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;font-size:15px;background:#fafbfd;color:#1a1a1a}
   input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue2);background:#fff}
+  input[readonly]{background:#f0f3f7;color:#555}
   textarea{resize:vertical;min-height:64px}
   .btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;transition:.15s}
   .btn:active{transform:scale(.98)}
-  .btn.ghost{background:#eef2f7;color:var(--blue)}
-  .btn.danger{background:var(--err)}
-  .btn.ok{background:var(--ok)}
+  .btn.danger{background:var(--err)} .btn.ok{background:var(--ok)}
   .hint{font-size:12px;color:var(--muted);margin-top:14px;text-align:center}
 
-  /* App shell */
   #app{max-width:680px;margin:0 auto;padding:12px 12px 90px}
   header{background:var(--blue);color:#fff;border-radius:12px;padding:14px 16px;margin-bottom:12px;position:relative}
   header .app{font-size:17px;font-weight:800}
@@ -49,12 +46,21 @@
   .kpi .l{font-size:11px;color:var(--muted);margin-top:2px}
   .kpi.warn .v{color:var(--err)} .kpi.ok .v{color:var(--ok)}
 
-  .row{display:flex;gap:10px}
-  .row>*{flex:1}
-  .fld{margin-bottom:12px}
+  .row{display:flex;gap:10px}.row>*{flex:1}
+  .fld{margin-bottom:12px;position:relative}
   .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
   .b-wait{background:#fff3d6;color:#9a6b00}.b-gdv{background:#d9ecff;color:#1a56a0}
   .b-gdm{background:#d6f0dd;color:#1e7c3c}.b-reject{background:#fde2df;color:#b3261e}.b-done{background:#d6f0dd;color:#1e7c3c}
+
+  .auto-wrap{position:relative}
+  .suggest{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:0 0 9px 9px;max-height:230px;overflow-y:auto;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .suggest .sg{padding:10px 12px;font-size:13.5px;border-bottom:1px solid #f0f2f5;cursor:pointer}
+  .suggest .sg:hover,.suggest .sg.on{background:#eef4fb}
+  .suggest .sg .st{font-weight:700;color:var(--blue)}
+  .suggest .sg .sub{font-size:12px;color:var(--muted)}
+
+  .linkinfo{background:#f6f8fb;border:1px dashed #c9d4e0;border-radius:9px;padding:10px 12px;font-size:13px;line-height:1.7;margin-bottom:12px}
+  .linkinfo b{color:var(--blue)}
 
   .item{background:var(--card);border-radius:12px;padding:13px 14px;margin-bottom:10px;border:1px solid var(--line)}
   .item .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
@@ -73,7 +79,6 @@
   .prog>div{height:100%;background:var(--ok);border-radius:6px}
   .prog.over>div{background:var(--err)}
   .empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:13.5px}
-  .fab{position:fixed;bottom:74px;left:50%;transform:translateX(-50%);max-width:680px;width:calc(100% - 24px)}
 
   .toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:11px 18px;border-radius:10px;font-size:13.5px;z-index:99;opacity:0;transition:.25s;pointer-events:none}
   .toast.show{opacity:1}
@@ -89,7 +94,7 @@
     <input id="pw" type="password" placeholder="Bỏ trống nếu chưa có">
     <div style="height:16px"></div>
     <button class="btn" onclick="login()">Đăng nhập</button>
-    <div class="hint">Gõ mã NV bất kỳ để xem demo · VD: <b>NV001</b> (NVCH), <b>GDV001</b> (GĐV), <b>GDM001</b> (GĐM)</div>
+    <div class="hint">Gõ mã NV để xem demo · <b>NV001</b> (NVCH), <b>GDV001</b> (GĐV), <b>GDM001</b> (GĐM)</div>
   </div>
 </div>
 
@@ -102,32 +107,40 @@
 
   <div class="tabs" id="tabs"></div>
 
-  <!-- Dashboard -->
   <div id="tab-dash">
     <div class="kpis" id="kpis"></div>
-    <div class="card"><h3>Ngân sách GĐV của bạn</h3><div id="myBudget"></div></div>
+    <div class="card"><h3>Ngân sách GĐV</h3><div id="myBudget"></div></div>
   </div>
 
-  <!-- Khai báo -->
   <div id="tab-kb" class="hidden">
     <div class="card">
       <h3>Khai báo công tác phí (CTP)</h3>
+
+      <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px">👤 Người công tác</div>
+      <div class="row">
+        <div class="fld auto-wrap"><label>Mã NV</label>
+          <input id="f-manv" placeholder="Nhập mã NV..." autocomplete="off" oninput="acNV(this.value)"></div>
+        <div class="fld"><label>Chức vụ</label>
+          <select id="f-chucvu"><option>CHT-NVCH</option><option>QLKV</option><option>HCV</option><option>GĐV</option><option>GĐM</option></select></div>
+      </div>
+
+      <div style="font-size:12px;color:var(--muted);font-weight:700;margin:6px 0">🏪 Cửa hàng (auto link GĐV / Miền)</div>
+      <div class="fld auto-wrap"><label>Mã CH (Mã SAP)</label>
+        <input id="f-mach" placeholder="Nhập mã CH hoặc tên cửa hàng..." autocomplete="off" oninput="acCH(this.value)">
+        <div class="suggest hidden" id="chSug"></div>
+      </div>
+      <div class="linkinfo hidden" id="chInfo"></div>
+
       <div class="fld"><label>Loại công tác</label>
-        <select id="f-loai">
-          <option>Hỗ trợ NSO</option><option>Hỗ trợ CH</option><option>Checklist CH</option>
-          <option>Họp / Đào tạo</option><option>Khác</option>
-        </select></div>
+        <select id="f-loai"><option>Hỗ trợ NSO</option><option>Hỗ trợ CH</option><option>Checklist CH</option><option>Họp / Đào tạo</option><option>Khác</option></select></div>
+
       <div class="row">
-        <div class="fld"><label>Điểm đi (CH hiện tại)</label><input id="f-di" placeholder="CH / tỉnh"></div>
-        <div class="fld"><label>Điểm đến (NSO/CH)</label><input id="f-den" placeholder="NSO / tỉnh"></div>
-      </div>
-      <div class="row">
+        <div class="fld"><label>Điểm đến (NSO/CH)</label><input id="f-den" placeholder="NSO / tỉnh đến"></div>
         <div class="fld"><label>Khoảng cách (km)</label><input id="f-km" type="number" placeholder="45" oninput="liveValid()"></div>
-        <div class="fld"><label>Số ngày</label><input id="f-ngay" type="number" value="1" min="1" oninput="liveValid()"></div>
       </div>
       <div class="row">
+        <div class="fld"><label>Số ngày</label><input id="f-ngay" type="number" value="1" min="1" oninput="liveValid()"></div>
         <div class="fld"><label>Ngày đi</label><input id="f-ngaydi" type="date"></div>
-        <div class="fld"><label>Ngày về</label><input id="f-ngayve" type="date"></div>
       </div>
       <div class="row">
         <div class="fld"><label>CTP — ăn/phụ cấp (đ)</label><input id="f-ctp" type="number" placeholder="500000" oninput="calc()"></div>
@@ -143,17 +156,14 @@
     </div>
   </div>
 
-  <!-- Danh sách -->
   <div id="tab-ds" class="hidden">
     <div class="card"><h3>Danh sách khai báo</h3><div id="listDS"></div></div>
   </div>
 
-  <!-- Phê duyệt -->
   <div id="tab-pd" class="hidden">
     <div class="card"><h3>Chờ phê duyệt</h3><div id="listPD"></div></div>
   </div>
 
-  <!-- Budget -->
   <div id="tab-budget" class="hidden">
     <div class="card"><h3>Ngân sách theo GĐV (tháng)</h3><div id="listBudget"></div></div>
   </div>
@@ -181,25 +191,25 @@ const GDV_BUDGET = [
   {ten:"Nguyễn Thị Yến",CH:66,NSO:0,K:1.1,budget:21.5},
 ];
 
-// Demo users — production sẽ đọc từ Sheet (tab 5-Users)
+// Demo users — production đọc từ Sheet 5-Users qua GAS
 const USERS = [
-  {maNV:"NV001",ten:"Nguyễn Văn A",role:"NV",gdv:"Hồ Nam"},
-  {maNV:"NV002",ten:"Trần Thị B",role:"NV",gdv:"Nguyễn Mạnh Sơn"},
-  {maNV:"QLKV001",ten:"Lê Văn C",role:"QLKV",gdv:"Hồ Nam"},
-  {maNV:"GDV001",ten:"Hồ Nam",role:"GDV",gdv:"Hồ Nam"},
-  {maNV:"GDV002",ten:"Nguyễn Mạnh Sơn",role:"GDV",gdv:"Nguyễn Mạnh Sơn"},
-  {maNV:"GDM001",ten:"Trần Đăng Hảo",role:"GDM",gdv:"*"},
-  {maNV:"ADMIN",ten:"Admin",role:"ADMIN",gdv:"*"},
+  {maNV:"NV001",ten:"Nguyễn Văn A",role:"NV"},
+  {maNV:"NV002",ten:"Trần Thị B",role:"NV"},
+  {maNV:"QLKV001",ten:"Lê Văn C",role:"QLKV"},
+  {maNV:"GDV001",ten:"Hồ Nam",role:"GDV"},
+  {maNV:"GDV002",ten:"Nguyễn Mạnh Sơn",role:"GDV"},
+  {maNV:"GDM001",ten:"Trần Đăng Hảo",role:"GDM"},
+  {maNV:"ADMIN",ten:"Admin",role:"ADMIN"},
 ];
 
-const STORE_KEY = "ctp_records_v1";
-const SESSION_KEY = "ctp_session_v1";
+let STORELIST = [];
+fetch('storelist.json').then(r=>r.json()).then(d=>{STORELIST=d}).catch(e=>console.log('storelist load fail'));
 
+const STORE_KEY="ctp_records_v2", SESSION_KEY="ctp_session_v2";
 function loadRecords(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||[]}catch(e){return[]}}
 function saveRecords(r){localStorage.setItem(STORE_KEY,JSON.stringify(r))}
 let RECORDS = loadRecords();
 
-// ================= HELPERS =================
 const $=id=>document.getElementById(id);
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
 function fmt(n){return (n||0).toLocaleString("vi-VN")+" đ"}
@@ -207,7 +217,7 @@ function fmtTr(n){return n.toLocaleString("vi-VN",{maximumFractionDigits:1})}
 
 function findUser(ma){return USERS.find(u=>u.maNV.toLowerCase()===String(ma).toLowerCase())}
 function gdvBudget(gdv){return GDV_BUDGET.find(g=>g.ten===gdv)}
-function usedBudget(gdv){return RECORDS.filter(r=>r.gdv===gdv && r.trangThai==="done").reduce((s,r)=>s+(r.tong||0),0)}
+function usedBudget(gdv){return RECORDS.filter(r=>r.gdv===gdv&&r.trangThai==="done").reduce((s,r)=>s+(r.tong||0),0)}
 
 const ST_LABEL={cho_gdv:"Chờ GĐV",gdv_duyet:"GĐV duyệt",cho_gdm:"Chờ GĐM",done:"Hoàn tất",tu_choi:"Từ chối"};
 const ST_CLASS={cho_gdv:"b-wait",gdv_duyet:"b-gdv",cho_gdm:"b-gdm",done:"b-done",tu_choi:"b-reject"};
@@ -215,23 +225,19 @@ const ST_CLASS={cho_gdv:"b-wait",gdv_duyet:"b-gdv",cho_gdm:"b-gdm",done:"b-done"
 // ================= AUTH =================
 let ME=null;
 function login(){
-  const ma=$("maNV").value.trim();
-  if(!ma){toast("Vui lòng nhập mã NV");return}
-  const u=findUser(ma);
-  if(!u){toast("Không tìm thấy mã NV: "+ma);return}
-  ME=u;
-  sessionStorage.setItem(SESSION_KEY,ma);
-  $("login").classList.add("hidden");
-  $("app").classList.remove("hidden");
-  $("whoLine").innerHTML = u.ten+" · "+u.role+(u.gdv!=="*"?" · GĐV: "+u.gdv:"");
+  const ma=$("maNV").value.trim(); if(!ma){toast("Vui lòng nhập mã NV");return}
+  const u=findUser(ma); if(!u){toast("Không tìm thấy mã NV: "+ma);return}
+  ME=u; sessionStorage.setItem(SESSION_KEY,ma);
+  $("login").classList.add("hidden"); $("app").classList.remove("hidden");
+  $("whoLine").innerHTML=u.ten+" · "+u.role;
   buildTabs(); renderAll();
 }
 function logout(){sessionStorage.removeItem(SESSION_KEY);location.reload()}
-(function(){const m=sessionStorage.getItem(SESSION_KEY);if(m){const u=findUser(m);if(u){$("maNV").value=m;login()}}})()
+(function(){const m=sessionStorage.getItem(SESSION_KEY);if(m){const u=findUser(m);if(u){$("maNV").value=m;login()}}})();
 
 function buildTabs(){
   const t=[["dash","Tổng quan"],["kb","Khai báo"],["ds","Danh sách"]];
-  if(ME.role==="GĐV"||ME.role==="GĐM"||ME.role==="ADMIN")t.push(["pd","Phê duyệt"]);
+  if(["GĐV","GĐM","ADMIN"].includes(ME.role))t.push(["pd","Phê duyệt"]);
   t.push(["budget","Ngân sách"]);
   $("tabs").innerHTML=t.map(([k,l])=>`<div class="tab${k==="dash"?" active":""}" data-k="${k}" onclick="switchTab('${k}')">${l}</div>`).join("");
 }
@@ -241,25 +247,49 @@ function switchTab(k){
   renderAll();
 }
 
-// ================= VALID =================
-function validRules(km,soNgay,loai,role,gdv,tong){
-  const w=[];let pass=true;
-  if(loai==="Hỗ trợ NSO"){
-    if(km<=30){w.push("⚠️ Khoảng cách ≤ 30km → theo nguyên tắc KHÔNG hỗ trợ CP (NVCH tự túc).");pass=false}
-    else if(km>80 && role==="NV"){w.push("⚠️ Khoảng cách > 80km → chỉ QLKV/đội NSO chuyên trách, không điều động NVCH.");pass=false}
-  }
-  if(soNgay>2){w.push("⚠️ Số ngày > 2 → cần GĐM duyệt (lý do cụ thể).")}
-  if(gdv&&gdv!=="*"){
-    const b=gdvBudget(gdv);if(b){
-      const rem=b.budget*1000*1000 - usedBudget(gdv);
-      if(tong>rem){w.push("🔴 Vượt ngân sách GĐV còn lại ("+fmtTr(rem/1000000)+" tr). Cần duyệt ngoại lệ.");}
-    }
-  }
-  return {pass, w};
+// ================= AUTOCOMPLETE =================
+function acNV(v){
+  v=v.trim().toLowerCase();
+  const u=v?findUser(v):null;
+  if(u){ $("f-chucvu").value = u.role==="NV"?"CHT-NVCH":(u.role==="QLKV"?"QLKV":(u.role==="GĐV"?"GĐV":(u.role==="GĐM"?"GĐM":"HCV"))); }
 }
-function liveValid(){const v=$("validBox");const km=+$("f-km").value||0,soNgay=+$("f-ngay").value||1,tong=calc();
-  const r=validRules(km,soNgay,$("f-loai").value,ME.role,ME.gdv,tong);
-  if(!$("f-km").value && !$("f-ctp").value){v.className="valid-box pass hidden";return}
+function acCH(v){
+  v=v.trim().toLowerCase(); const box=$("chSug");
+  if(!v||!STORELIST.length){box.classList.add("hidden");return}
+  const hits=STORELIST.filter(s=>s.ma.toLowerCase().includes(v)||s.ten.toLowerCase().includes(v)).slice(0,25);
+  if(!hits.length){box.classList.add("hidden");return}
+  box.innerHTML=hits.map(s=>`<div class="sg" onclick="pickCH('${s.ma}')"><span class="st">${s.ma}</span> · ${s.ten}<div class="sub">${s.gdv||"—"} · ${s.mien||"—"} · ${s.tinh||"—"}</div></div>`).join("");
+  box.classList.remove("hidden");
+}
+let selCH=null;
+function pickCH(ma){
+  selCH=STORELIST.find(s=>s.ma===ma); if(!selCH)return;
+  $("f-mach").value=ma; $("chSug").classList.add("hidden");
+  $("chInfo").classList.remove("hidden");
+  $("chInfo").innerHTML=`<b>${selCH.ten}</b><br>GĐV: <b>${selCH.gdv||"—"}</b> · Miền: <b>${selCH.mien||"—"}</b><br>Tỉnh: ${selCH.tinh||"—"} · QLKV: ${selCH.qlkv||"—"}`;
+  liveValid();
+}
+
+// ================= VALID =================
+function validRules(km,soNgay,loai,chucVu,gdv,tong){
+  const w=[];let pass=true;
+  const isNV = chucVu==="CHT-NVCH"||chucVu==="HCV";
+  if(loai==="Hỗ trợ NSO"){
+    if(km<=30){w.push("⚠️ ≤ 30km → KHÔNG hỗ trợ CP (NVCH tự túc).");pass=false}
+    else if(km>80 && isNV){w.push("⚠️ > 80km → chỉ QLKV/đội NSO chuyên trách, không điều động NVCH.");pass=false}
+  }
+  if(soNgay>2){w.push("⚠️ > 2 ngày → cần GĐM duyệt.")}
+  if(gdv&&gdv!=="*"){
+    const b=gdvBudget(gdv);
+    if(b){const rem=b.budget*1e6-usedBudget(gdv); if(tong>rem)w.push("🔴 Vượt ngân sách GĐV còn lại ("+fmtTr(rem/1e6)+" tr). Cần duyệt ngoại lệ.");}
+  }
+  return {pass,w};
+}
+function liveValid(){
+  const v=$("validBox"),km=+$("f-km").value||0,soNgay=+$("f-ngay").value||1,tong=calc();
+  const gdv=selCH?selCH.gdv:(ME?ME.ten:null);
+  const r=validRules(km,soNgay,$("f-loai").value,$("f-chucvu").value,gdv,tong);
+  if(!$("f-km").value){v.className="valid-box pass hidden";return}
   v.classList.remove("hidden");
   if(!r.pass){v.className="valid-box fail";v.innerHTML="<b>Lưu ý:</b><br>• "+r.w.join("<br>• ")}
   else{v.className="valid-box pass";v.innerHTML="✅ Hợp lệ — sẵn sàng gửi duyệt."}
@@ -269,34 +299,39 @@ function calc(){const ctp=+$("f-ctp").value||0,ks=+$("f-ks").value||0,x=+$("f-xa
 
 // ================= SUBMIT =================
 function submitKB(){
-  const loai=$("f-loai").value,di=$("f-di").value.trim(),den=$("f-den").value.trim();
-  const km=+$("f-km").value||0,soNgay=+$("f-ngay").value||1;
-  const ctp=+$("f-ctp").value||0,ks=+$("f-ks").value||0,x=+$("f-xang").value||0,tong=ctp+ks+x;
-  if(!di||!den){toast("Vui lòng nhập điểm đi & điểm đến");return}
+  const manv=$("f-manv").value.trim(), mach=$("f-mach").value.trim();
+  if(!manv){toast("Vui lòng nhập Mã NV");return}
+  if(!selCH||!mach){toast("Vui lòng chọn Mã CH (cửa hàng)");return}
+  const loai=$("f-loai").value, den=$("f-den").value.trim();
+  const km=+$("f-km").value||0, soNgay=+$("f-ngay").value||1;
+  const ctp=+$("f-ctp").value||0, ks=+$("f-ks").value||0, x=+$("f-xang").value||0, tong=ctp+ks+x;
   if(!km){toast("Vui lòng nhập khoảng cách");return}
   if(!tong){toast("Vui lòng nhập chi phí");return}
-  const r=validRules(km,soNgay,loai,ME.role,ME.gdv,tong);
+  const chucVu=$("f-chucvu").value;
+  const r=validRules(km,soNgay,loai,chucVu,selCH.gdv,tong);
+  const u=findUser(manv);
   let status="cho_gdv";
-  if(ME.role==="GDV"){status= soNgay>2||km>80 ? "cho_gdm":"gdv_duyet"; if(status==="gdv_duyet")status="done"}
-  if(ME.role==="GDM"||ME.role==="ADMIN"){status="done"}
-  const rec={id:Date.now(),maNV:ME.maNV,ten:ME.ten,role:ME.role,gdv:ME.gdv==="*"?pickGdv():ME.gdv,
-    loai,di,den,km,soNgay,ngayDi:$("f-ngaydi").value,ngayVe:$("f-ngayve").value,
+  if(ME.role==="GĐV")status=(soNgay>2||km>80)?"cho_gdm":"done";
+  if(["GĐM","ADMIN"].includes(ME.role))status="done";
+  const rec={id:Date.now(),maNV:manv,ten:(u&&u.ten)||manv,role:ME.role,chucVu,
+    maCH:selCH.ma,tenCH:selCH.ten,gdv:selCH.gdv,mien:selCH.mien,tinh:selCH.tinh,qlkv:selCH.qlkv,
+    loai,den,km,soNgay,ngayDi:$("f-ngaydi").value,
     ctp,ks,xang:x,tong,ghiChu:$("f-ghichu").value.trim(),
-    trangThai:status,ngayTao:new Date().toISOString().slice(0,16).replace("T"," "),
-    validWarn:r.w};
+    trangThai:status,ngayTao:new Date().toISOString().slice(0,16).replace("T"," "),validWarn:r.w};
   RECORDS.unshift(rec);saveRecords(RECORDS);
   toast("✅ Đã gửi khai báo ("+ST_LABEL[status]+")");
-  ["f-di","f-den","f-km","f-ngay","f-ctp","f-ks","f-xang","f-ghichu","f-ngaydi","f-ngayve"].forEach(i=>$("f-"+i==="f-ngay"?i:"f-"+i).value="");
-  $("f-ngay").value=1;$("f-loai").value="Hỗ trợ NSO";$("f-tong").textContent="0 đ";$("validBox").className="valid-box pass hidden";
+  ["f-manv","f-mach","f-den","f-km","f-ngay","f-ctp","f-ks","f-xang","f-ghichu","f-ngaydi"].forEach(i=>$(i).value="");
+  $("f-ngay").value=1;$("f-loai").value="Hỗ trợ NSO";$("f-tong").textContent="0 đ";
+  $("chInfo").classList.add("hidden");selCH=null;
+  $("validBox").className="valid-box pass hidden";
   renderAll();
 }
-function pickGdv(){const g=prompt("Nhập GĐV chịu ngân sách (tên):","Hồ Nam");return g||"Hồ Nam"}
 
 // ================= APPROVE =================
 function approve(id){
   const r=RECORDS.find(x=>x.id===id);if(!r)return;
   if(ME.role==="GĐV"){
-    if(r.km>80||r.soNgay>2||r.validWarn.length){r.trangThai="cho_gdm";toast("Đã chuyển GĐM duyệt (cần cấp trên)")}
+    if(r.km>80||r.soNgay>2||(r.validWarn&&r.validWarn.length)){r.trangThai="cho_gdm";toast("Đã chuyển GĐM duyệt")}
     else{r.trangThai="done";toast("✅ Đã duyệt")}
   }else{r.trangThai="done";toast("✅ Đã duyệt hoàn tất")}
   saveRecords(RECORDS);renderAll();
@@ -309,20 +344,20 @@ function reject(id){
 // ================= RENDER =================
 function renderAll(){renderKpi();renderBudget();renderDS();renderPD();renderMyBudget()}
 function renderKpi(){
-  const mine=RECORDS.filter(r=>ME.gdv==="*"?true:r.gdv===ME.gdv);
-  const pending=mine.filter(r=>r.trangThai==="cho_gdv"||r.trangThai==="cho_gdm").length;
+  const mine=RECORDS.filter(r=>ME.role==="GĐV"?r.gdv===ME.ten:true);
+  const pending=mine.filter(r=>["cho_gdv","cho_gdm"].includes(r.trangThai)).length;
   const done=mine.filter(r=>r.trangThai==="done").length;
   const total=mine.filter(r=>r.trangThai==="done").reduce((s,r)=>s+r.tong,0);
   $("kpis").innerHTML=`
     <div class="kpi"><div class="v">${mine.length}</div><div class="l">Khai báo</div></div>
     <div class="kpi warn"><div class="v">${pending}</div><div class="l">Chờ duyệt</div></div>
-    <div class="kpi ok"><div class="v">${fmtTr(total/1000000)}<small>tr</small></div><div class="l">Đã duyệt</div></div>`;
+    <div class="kpi ok"><div class="v">${fmtTr(total/1e6)}<small>tr</small></div><div class="l">Đã duyệt</div></div>`;
 }
 function renderMyBudget(){
-  if(ME.gdv==="*"){$("myBudget").innerHTML='<div class="empty">GĐM / Admin xem tổng ở tab "Ngân sách".</div>';return}
-  const b=gdvBudget(ME.gdv);if(!b){$("myBudget").innerHTML='<div class="empty">Chưa có ngân sách cho GĐV này.</div>';return}
-  const used=usedBudget(ME.gdv),rem=b.budget*1e6-used,pct=used/(b.budget*1e6)*100;
-  const over=pct>100;
+  const gdv = (ME.role==="GĐV")?ME.ten:null;
+  if(!gdv){$("myBudget").innerHTML='<div class="empty">Chọn Mã CH khi khai báo để xem ngân sách GĐV tương ứng. GĐM/Admin xem ở tab "Ngân sách".</div>';return}
+  const b=gdvBudget(gdv);if(!b){$("myBudget").innerHTML='<div class="empty">Chưa có ngân sách cho GĐV này.</div>';return}
+  const used=usedBudget(gdv),rem=b.budget*1e6-used,pct=used/(b.budget*1e6)*100,over=pct>100;
   $("myBudget").innerHTML=`
     <div style="font-size:13px;color:#555">Tổng: <b>${fmtTr(b.budget)} tr</b> · Đã dùng: <b>${fmtTr(used/1e6)} tr</b> · Còn: <b style="color:${over?'var(--err)':'var(--ok)'}">${fmtTr(rem/1e6)} tr</b></div>
     <div class="prog ${over?'over':''}"><div style="width:${Math.min(pct,100)}%"></div></div>
@@ -338,27 +373,25 @@ function renderBudget(){
       <div class="meta" style="margin-top:4px">Đã dùng ${fmtTr(used/1e6)} tr · Còn ${fmtTr(rem/1e6)} tr</div></div>`}).join("");
 }
 function itemHtml(r,showActs){
-  const st=ST_LABEL[r.trangThai]||r.trangThai;
-  const cls=ST_CLASS[r.trangThai]||"b-wait";
-  return `<div class="item"><div class="top"><div><div class="name">${r.ten} <span style="font-weight:400;font-size:12px;color:var(--muted)">(${r.role})</span></div>
-    <div class="meta">${r.loai} · ${r.di} → ${r.den} · ${r.km}km · ${r.soNgay} ngày · ${r.ngayTao}</div></div>
+  const st=ST_LABEL[r.trangThai]||r.trangThai, cls=ST_CLASS[r.trangThai]||"b-wait";
+  return `<div class="item"><div class="top"><div><div class="name">${r.ten} <span style="font-weight:400;font-size:12px;color:var(--muted)">(${r.chucVu||r.role})</span></div>
+    <div class="meta">${r.loai} · ${r.tenCH||r.maCH} → ${r.den||"—"} · ${r.km}km · ${r.soNgay} ngày · ${r.ngayTao}</div>
+    <div class="meta">GĐV: ${r.gdv||"—"} · Miền: ${r.mien||"—"}</div></div>
     <div style="text-align:right"><div class="money">${fmt(r.tong)}</div><span class="badge ${cls}">${st}</span></div></div>
-    <div class="body">${r.ghiChu||""}${r.lyDo?'<div style="color:var(--err);margin-top:3px">↳ Từ chối: '+r.lyDo+'</div>':''}
+    <div class="body">${r.ghiChu||""}${r.lyDo?'<div style="color:var(--err);margin-top:3px">↳ Từ chối: '+r.lyDo+'</div>':""}
     ${r.validWarn&&r.validWarn.length?'<div class="valid-box warn" style="margin-top:8px">'+r.validWarn.map(x=>"• "+x).join("<br>")+'</div>':""}</div>
-    ${showActs&&(r.trangThai==="cho_gdv"||r.trangThai==="cho_gdm")?`<div class="acts">
-      <button class="btn ok" onclick="approve(${r.id})">Duyệt</button>
-      <button class="btn danger" onclick="reject(${r.id})">Từ chối</button></div>`:""}</div>`;
+    ${showActs&&["cho_gdv","cho_gdm"].includes(r.trangThai)?`<div class="acts"><button class="btn ok" onclick="approve(${r.id})">Duyệt</button><button class="btn danger" onclick="reject(${r.id})">Từ chối</button></div>`:""}</div>`;
 }
 function renderDS(){
-  const mine=RECORDS.filter(r=>ME.gdv==="*"?true:r.gdv===ME.gdv);
+  const mine=RECORDS.filter(r=>ME.role==="GĐV"?r.gdv===ME.ten:true);
   if(!mine.length){$("listDS").innerHTML='<div class="empty">Chưa có khai báo nào.</div>';return}
   $("listDS").innerHTML=mine.map(r=>itemHtml(r,false)).join("");
 }
 function renderPD(){
-  if(!(ME.role==="GĐV"||ME.role==="GĐM"||ME.role==="ADMIN")){$("listPD").innerHTML='<div class="empty">Chỉ GĐV/GĐM mới phê duyệt.</div>';return}
+  if(!["GĐV","GĐM","ADMIN"].includes(ME.role)){$("listPD").innerHTML='<div class="empty">Chỉ GĐV/GĐM mới phê duyệt.</div>';return}
   let pool=RECORDS;
-  if(ME.role==="GĐV")pool=pool.filter(r=>r.gdv===ME.gdv && (r.trangThai==="cho_gdv"));
-  else pool=pool.filter(r=>r.trangThai==="cho_gdm"||r.trangThai==="cho_gdv");
+  if(ME.role==="GĐV")pool=pool.filter(r=>r.gdv===ME.ten&&r.trangThai==="cho_gdv");
+  else pool=pool.filter(r=>["cho_gdm","cho_gdv"].includes(r.trangThai));
   if(!pool.length){$("listPD").innerHTML='<div class="empty">Không có phiếu chờ duyệt.</div>';return}
   $("listPD").innerHTML=pool.map(r=>itemHtml(r,true)).join("");
 }
