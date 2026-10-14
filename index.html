@@ -123,7 +123,7 @@
         <div class="suggest hidden" id="nvSug"></div>
       </div>
       <div class="row">
-        <div class="fld"><label>Họ và tên</label><input id="f-hoten" placeholder="Tự điền" readonly></div>
+        <div class="fld"><label>Họ và tên</label><input id="f-hoten" placeholder="Nhập họ tên"></div>
         <div class="fld"><label>Chức vụ</label>
           <select id="f-chucvu"><option>CHT-NVCH</option><option>QLKV</option><option>HCV</option><option>GĐV</option><option>GĐM</option></select></div>
       </div>
@@ -136,12 +136,16 @@
         <div class="fld"><label>Khoảng cách (km)</label><input id="f-km" type="number" placeholder="45" oninput="liveValid()"></div>
       </div>
       <div class="row">
-        <div class="fld"><label>Số ngày</label><input id="f-ngay" type="number" value="1" min="1" oninput="liveValid()"></div>
-        <div class="fld"><label>Ngày đi</label><input id="f-ngaydi" type="date"></div>
+        <div class="fld"><label>Ngày đi</label><input id="f-ngaydi" type="date" onchange="autoDays()"></div>
+        <div class="fld"><label>Ngày về</label><input id="f-ngayve" type="date" onchange="autoDays()"></div>
       </div>
       <div class="row">
-        <div class="fld"><label>CTP — ăn/phụ cấp (đ)</label><input id="f-ctp" type="number" placeholder="500000" oninput="calc()"></div>
-        <div class="fld"><label>Khách sạn / lưu trú (đ)</label><input id="f-ks" type="number" placeholder="300000" oninput="calc()"></div>
+        <div class="fld"><label>Số ngày CTP (auto)</label><input id="f-ngayctp" readonly placeholder="về − đi + 1"></div>
+        <div class="fld"><label>Số ngày KS (auto)</label><input id="f-ngayks" readonly placeholder="về − đi"></div>
+      </div>
+      <div class="row">
+        <div class="fld"><label>CTP / ngày (đ)</label><input id="f-ctp" type="number" placeholder="500000" oninput="calc()"></div>
+        <div class="fld"><label>KS / ngày (đ)</label><input id="f-ks" type="number" placeholder="300000" oninput="calc()"></div>
       </div>
       <div class="fld"><label>Xăng / đi lại (đ)</label><input id="f-xang" type="number" placeholder="200000" oninput="calc()"></div>
       <div class="fld"><label>Ghi chú</label><textarea id="f-ghichu" placeholder="Lý do, mục đích chuyến đi..."></textarea></div>
@@ -308,7 +312,7 @@ function validRules(km,soNgay,loai,chucVu,gdv,tong){
   return {pass,w};
 }
 function liveValid(){
-  const v=$("validBox"),km=+$("f-km").value||0,soNgay=+$("f-ngay").value||1,tong=calc();
+  const v=$("validBox"),km=+$("f-km").value||0,soNgay=+$("f-ngayctp").value||0,tong=calc();
   const gdv=selCH?selCH.gdv:null;
   const r=validRules(km,soNgay,$("f-loai").value,$("f-chucvu").value,gdv,tong);
   if(!$("f-km").value){v.className="valid-box pass hidden";return}
@@ -316,8 +320,19 @@ function liveValid(){
   if(!r.pass){v.className="valid-box fail";v.innerHTML="<b>Lưu ý:</b><br>• "+r.w.join("<br>• ")}
   else{v.className="valid-box pass";v.innerHTML="✅ Hợp lệ — sẵn sàng gửi duyệt."}
 }
-function calc(){const ctp=+$("f-ctp").value||0,ks=+$("f-ks").value||0,x=+$("f-xang").value||0;
-  $("f-tong").textContent=fmt(ctp+ks+x);return ctp+ks+x}
+function autoDays(){
+  const di=$("f-ngaydi").value, ve=$("f-ngayve").value;
+  if(di&&ve){
+    const a=new Date(di), b=new Date(ve), diff=Math.round((b-a)/86400000);
+    if(diff<0){$("f-ngayctp").value="";$("f-ngayks").value="";toast("Ngày về phải ≥ ngày đi");}
+    else{$("f-ngayctp").value=diff+1;$("f-ngayks").value=diff;}
+  } else {$("f-ngayctp").value="";$("f-ngayks").value="";}
+  liveValid();
+}
+function calc(){const ctpNgay=+$("f-ctp").value||0,ksNgay=+$("f-ks").value||0,x=+$("f-xang").value||0;
+  const nctp=+$("f-ngayctp").value||0,nks=+$("f-ngayks").value||0;
+  const total=ctpNgay*nctp+ksNgay*nks+x;
+  $("f-tong").textContent=fmt(total);return total}
 
 // ================= SUBMIT =================
 function submitKB(){
@@ -325,9 +340,11 @@ function submitKB(){
   if(!mach||!selCH){toast("Bước 1: gõ Mã CH trước");return}
   if(!manv){toast("Bước 2: nhập Mã NV (người công tác)");return}
   const loai=$("f-loai").value, den=$("f-den").value.trim();
-  const km=+$("f-km").value||0, soNgay=+$("f-ngay").value||1;
-  const ctp=+$("f-ctp").value||0, ks=+$("f-ks").value||0, x=+$("f-xang").value||0, tong=ctp+ks+x;
+  const km=+$("f-km").value||0, soNgay=+$("f-ngayctp").value||0, soNgayKS=+$("f-ngayks").value||0;
+  const ctpNgay=+$("f-ctp").value||0, ksNgay=+$("f-ks").value||0, x=+$("f-xang").value||0;
+  const ctp=ctpNgay*soNgay, ks=ksNgay*soNgayKS, tong=calc();
   if(!km){toast("Vui lòng nhập khoảng cách");return}
+  if(!$("f-ngaydi").value||!$("f-ngayve").value){toast("Vui lòng nhập Ngày đi + Ngày về");return}
   if(!tong){toast("Vui lòng nhập chi phí");return}
   const chucVu=$("f-chucvu").value;
   const r=validRules(km,soNgay,loai,chucVu,selCH.gdv,tong);
@@ -335,15 +352,15 @@ function submitKB(){
   let status="cho_gdv";
   if(ME.chucVu==="GĐV")status=(soNgay>2||km>80)?"cho_gdm":"done";
   if(["GĐM","ADMIN"].includes(ME.chucVu))status="done";
-  const rec={id:Date.now(),maNV:manv,ten:(u&&u.ten)||$("f-hoten").value||manv,chucVu,
+  const rec={id:Date.now(),maNV:manv,ten:$("f-hoten").value.trim()||(u&&u.ten)||manv,chucVu,
     maCH:selCH.ma,tenCH:selCH.ten,gdv:selCH.gdv,mien:selCH.mien,tinh:selCH.tinh,qlkv:selCH.qlkv,
-    loai,den,km,soNgay,ngayDi:$("f-ngaydi").value,
+    loai,den,km,soNgay,soNgayKS,ngayDi:$("f-ngaydi").value,ngayVe:$("f-ngayve").value,
     ctp,ks,xang:x,tong,ghiChu:$("f-ghichu").value.trim(),
     trangThai:status,ngayTao:new Date().toISOString().slice(0,16).replace("T"," "),validWarn:r.w};
   RECORDS.unshift(rec);saveRecords(RECORDS);
   toast("✅ Đã gửi khai báo ("+ST_LABEL[status]+")");
-  ["f-mach","f-manv","f-hoten","f-den","f-km","f-ngay","f-ctp","f-ks","f-xang","f-ghichu","f-ngaydi"].forEach(i=>$(i).value="");
-  $("f-ngay").value=1;$("f-loai").value="Hỗ trợ NSO";$("f-tong").textContent="0 đ";
+  ["f-mach","f-manv","f-hoten","f-den","f-km","f-ngayctp","f-ngayks","f-ctp","f-ks","f-xang","f-ghichu","f-ngaydi","f-ngayve"].forEach(i=>$(i).value="");
+  $("f-loai").value="Hỗ trợ NSO";$("f-tong").textContent="0 đ";
   $("chInfo").classList.add("hidden");selCH=null;
   $("validBox").className="valid-box pass hidden";
   renderAll();
