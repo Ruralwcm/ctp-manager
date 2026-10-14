@@ -25,7 +25,7 @@
   textarea{resize:vertical;min-height:64px}
   .btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;background:var(--blue);color:#fff;transition:.15s}
   .btn:active{transform:scale(.98)}
-  .btn.danger{background:var(--err)} .btn.ok{background:var(--ok)}
+  .btn.danger{background:var(--err)} .btn.ok{background:var(--ok)} .btn.ghost{background:#eef2f7;color:var(--blue)}
   .hint{font-size:12px;color:var(--muted);margin-top:14px;text-align:center}
 
   #app{max-width:680px;margin:0 auto;padding:12px 12px 90px}
@@ -35,7 +35,7 @@
   header .logout{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.18);border:none;color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;cursor:pointer}
 
   .tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px}
-  .tab{flex:1;min-width:86px;text-align:center;padding:10px 6px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+  .tab{flex:1;min-width:80px;text-align:center;padding:10px 6px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
   .tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
 
   .card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
@@ -53,14 +53,15 @@
   .b-gdm{background:#d6f0dd;color:#1e7c3c}.b-reject{background:#fde2df;color:#b3261e}.b-done{background:#d6f0dd;color:#1e7c3c}
 
   .auto-wrap{position:relative}
-  .suggest{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:0 0 9px 9px;max-height:230px;overflow-y:auto;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .suggest{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:0 0 9px 9px;max-height:240px;overflow-y:auto;z-index:50;box-shadow:0 6px 18px rgba(0,0,0,.12)}
   .suggest .sg{padding:10px 12px;font-size:13.5px;border-bottom:1px solid #f0f2f5;cursor:pointer}
-  .suggest .sg:hover,.suggest .sg.on{background:#eef4fb}
+  .suggest .sg:hover{background:#eef4fb}
   .suggest .sg .st{font-weight:700;color:var(--blue)}
   .suggest .sg .sub{font-size:12px;color:var(--muted)}
 
   .linkinfo{background:#f6f8fb;border:1px dashed #c9d4e0;border-radius:9px;padding:10px 12px;font-size:13px;line-height:1.7;margin-bottom:12px}
   .linkinfo b{color:var(--blue)}
+  .sec-t{font-size:12px;color:var(--muted);font-weight:700;margin:8px 0 6px;text-transform:uppercase;letter-spacing:.3px}
 
   .item{background:var(--card);border-radius:12px;padding:13px 14px;margin-bottom:10px;border:1px solid var(--line)}
   .item .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
@@ -90,11 +91,9 @@
     <div class="logo"><div class="t">CTP Manager</div><div class="s">Khai báo · Valid · Phê duyệt công tác phí</div></div>
     <label>Mã nhân viên (Mã NV)</label>
     <input id="maNV" placeholder="VD: NV001 / GDV001 / GDM001" autocomplete="off">
-    <label>Mật khẩu (demo: bỏ trống)</label>
-    <input id="pw" type="password" placeholder="Bỏ trống nếu chưa có">
     <div style="height:16px"></div>
-    <button class="btn" onclick="login()">Đăng nhập</button>
-    <div class="hint">Gõ mã NV để xem demo · <b>NV001</b> (NVCH), <b>GDV001</b> (GĐV), <b>GDM001</b> (GĐM)</div>
+    <button class="btn" onclick="login()">Vào</button>
+    <div class="hint">Demo: <b>NV001</b> (NVCH) · <b>GDV001</b> (GĐV) · <b>GDM001</b> (GĐM)</div>
   </div>
 </div>
 
@@ -107,33 +106,31 @@
 
   <div class="tabs" id="tabs"></div>
 
-  <div id="tab-dash">
-    <div class="kpis" id="kpis"></div>
-    <div class="card"><h3>Ngân sách GĐV</h3><div id="myBudget"></div></div>
-  </div>
-
-  <div id="tab-kb" class="hidden">
+  <div id="tab-kb">
     <div class="card">
       <h3>Khai báo công tác phí (CTP)</h3>
 
-      <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px">👤 Người công tác</div>
-      <div class="row">
-        <div class="fld auto-wrap"><label>Mã NV</label>
-          <input id="f-manv" placeholder="Nhập mã NV..." autocomplete="off" oninput="acNV(this.value)"></div>
-        <div class="fld"><label>Chức vụ</label>
-          <select id="f-chucvu"><option>CHT-NVCH</option><option>QLKV</option><option>HCV</option><option>GĐV</option><option>GĐM</option></select></div>
-      </div>
-
-      <div style="font-size:12px;color:var(--muted);font-weight:700;margin:6px 0">🏪 Cửa hàng (auto link GĐV / Miền)</div>
+      <div class="sec-t">🏪 Bước 1 — Gõ Mã CH (auto link GĐV / Miền)</div>
       <div class="fld auto-wrap"><label>Mã CH (Mã SAP)</label>
-        <input id="f-mach" placeholder="Nhập mã CH hoặc tên cửa hàng..." autocomplete="off" oninput="acCH(this.value)">
+        <input id="f-mach" placeholder="Gõ mã CH hoặc tên cửa hàng..." autocomplete="off" oninput="acCH(this.value)">
         <div class="suggest hidden" id="chSug"></div>
       </div>
       <div class="linkinfo hidden" id="chInfo"></div>
 
+      <div class="sec-t">👤 Bước 2 — Người công tác</div>
+      <div class="fld auto-wrap"><label>Mã NV</label>
+        <input id="f-manv" placeholder="Gõ mã NV..." autocomplete="off" oninput="acNV(this.value)">
+        <div class="suggest hidden" id="nvSug"></div>
+      </div>
+      <div class="row">
+        <div class="fld"><label>Họ và tên</label><input id="f-hoten" placeholder="Tự điền" readonly></div>
+        <div class="fld"><label>Chức vụ</label>
+          <select id="f-chucvu"><option>CHT-NVCH</option><option>QLKV</option><option>HCV</option><option>GĐV</option><option>GĐM</option></select></div>
+      </div>
+
+      <div class="sec-t">🧾 Bước 3 — Thông tin chuyến đi</div>
       <div class="fld"><label>Loại công tác</label>
         <select id="f-loai"><option>Hỗ trợ NSO</option><option>Hỗ trợ CH</option><option>Checklist CH</option><option>Họp / Đào tạo</option><option>Khác</option></select></div>
-
       <div class="row">
         <div class="fld"><label>Điểm đến (NSO/CH)</label><input id="f-den" placeholder="NSO / tỉnh đến"></div>
         <div class="fld"><label>Khoảng cách (km)</label><input id="f-km" type="number" placeholder="45" oninput="liveValid()"></div>
@@ -167,6 +164,21 @@
   <div id="tab-budget" class="hidden">
     <div class="card"><h3>Ngân sách theo GĐV (tháng)</h3><div id="listBudget"></div></div>
   </div>
+
+  <div id="tab-nv" class="hidden">
+    <div class="card">
+      <h3>Nhân viên (db nhân viên)</h3>
+      <div class="row">
+        <div class="fld"><input id="nv-ma" placeholder="Mã NV"></div>
+        <div class="fld"><input id="nv-ten" placeholder="Họ tên"></div>
+      </div>
+      <div class="row">
+        <div class="fld"><select id="nv-cv"><option>CHT-NVCH</option><option>QLKV</option><option>HCV</option><option>GĐV</option><option>GĐM</option></select></div>
+        <div class="fld"><button class="btn ghost" onclick="addNV()">+ Thêm</button></div>
+      </div>
+      <div id="listNV" style="margin-top:12px"></div>
+    </div>
+  </div>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -191,67 +203,77 @@ const GDV_BUDGET = [
   {ten:"Nguyễn Thị Yến",CH:66,NSO:0,K:1.1,budget:21.5},
 ];
 
-// Demo users — production đọc từ Sheet 5-Users qua GAS
-const USERS = [
-  {maNV:"NV001",ten:"Nguyễn Văn A",role:"NV"},
-  {maNV:"NV002",ten:"Trần Thị B",role:"NV"},
-  {maNV:"QLKV001",ten:"Lê Văn C",role:"QLKV"},
-  {maNV:"GDV001",ten:"Hồ Nam",role:"GDV"},
-  {maNV:"GDV002",ten:"Nguyễn Mạnh Sơn",role:"GDV"},
-  {maNV:"GDM001",ten:"Trần Đăng Hảo",role:"GDM"},
-  {maNV:"ADMIN",ten:"Admin",role:"ADMIN"},
+const DEFAULT_NV = [
+  {maNV:"NV001",ten:"Nguyễn Văn A",chucVu:"CHT-NVCH"},
+  {maNV:"NV002",ten:"Trần Thị B",chucVu:"CHT-NVCH"},
+  {maNV:"QLKV001",ten:"Lê Văn C",chucVu:"QLKV"},
+  {maNV:"GDV001",ten:"Hồ Nam",chucVu:"GĐV"},
+  {maNV:"GDV002",ten:"Nguyễn Mạnh Sơn",chucVu:"GĐV"},
+  {maNV:"GDM001",ten:"Trần Đăng Hảo",chucVu:"GĐM"},
 ];
 
 let STORELIST = [];
 fetch('storelist.json').then(r=>r.json()).then(d=>{STORELIST=d}).catch(e=>console.log('storelist load fail'));
 
-const STORE_KEY="ctp_records_v2", SESSION_KEY="ctp_session_v2";
+const STORE_KEY="ctp_records_v3", SESSION_KEY="ctp_session_v3", NV_KEY="ctp_nvdb_v1";
 function loadRecords(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||[]}catch(e){return[]}}
 function saveRecords(r){localStorage.setItem(STORE_KEY,JSON.stringify(r))}
+function loadNV(){try{return JSON.parse(localStorage.getItem(NV_KEY))||DEFAULT_NV}catch(e){return DEFAULT_NV}}
+function saveNV(r){localStorage.setItem(NV_KEY,JSON.stringify(r))}
 let RECORDS = loadRecords();
+let NVDB = loadNV();
 
 const $=id=>document.getElementById(id);
 function toast(m){const t=$("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
 function fmt(n){return (n||0).toLocaleString("vi-VN")+" đ"}
 function fmtTr(n){return n.toLocaleString("vi-VN",{maximumFractionDigits:1})}
 
-function findUser(ma){return USERS.find(u=>u.maNV.toLowerCase()===String(ma).toLowerCase())}
+function findNV(ma){return NVDB.find(u=>u.maNV.toLowerCase()===String(ma).toLowerCase())}
 function gdvBudget(gdv){return GDV_BUDGET.find(g=>g.ten===gdv)}
 function usedBudget(gdv){return RECORDS.filter(r=>r.gdv===gdv&&r.trangThai==="done").reduce((s,r)=>s+(r.tong||0),0)}
 
 const ST_LABEL={cho_gdv:"Chờ GĐV",gdv_duyet:"GĐV duyệt",cho_gdm:"Chờ GĐM",done:"Hoàn tất",tu_choi:"Từ chối"};
 const ST_CLASS={cho_gdv:"b-wait",gdv_duyet:"b-gdv",cho_gdm:"b-gdm",done:"b-done",tu_choi:"b-reject"};
+const canApprove = cv => ["GĐV","GĐM","ADMIN"].includes(cv);
 
 // ================= AUTH =================
 let ME=null;
 function login(){
   const ma=$("maNV").value.trim(); if(!ma){toast("Vui lòng nhập mã NV");return}
-  const u=findUser(ma); if(!u){toast("Không tìm thấy mã NV: "+ma);return}
+  const u=findNV(ma); if(!u){toast("Không tìm thấy mã NV: "+ma+" (thêm ở tab Nhân viên)");return}
   ME=u; sessionStorage.setItem(SESSION_KEY,ma);
   $("login").classList.add("hidden"); $("app").classList.remove("hidden");
-  $("whoLine").innerHTML=u.ten+" · "+u.role;
-  buildTabs(); renderAll();
+  $("whoLine").innerHTML=u.ten+" · "+u.chucVu;
+  buildTabs(); switchTab("kb");
 }
 function logout(){sessionStorage.removeItem(SESSION_KEY);location.reload()}
-(function(){const m=sessionStorage.getItem(SESSION_KEY);if(m){const u=findUser(m);if(u){$("maNV").value=m;login()}}})();
+(function(){const m=sessionStorage.getItem(SESSION_KEY);if(m){const u=findNV(m);if(u){$("maNV").value=m;login()}}})()
 
 function buildTabs(){
-  const t=[["dash","Tổng quan"],["kb","Khai báo"],["ds","Danh sách"]];
-  if(["GĐV","GĐM","ADMIN"].includes(ME.role))t.push(["pd","Phê duyệt"]);
-  t.push(["budget","Ngân sách"]);
-  $("tabs").innerHTML=t.map(([k,l])=>`<div class="tab${k==="dash"?" active":""}" data-k="${k}" onclick="switchTab('${k}')">${l}</div>`).join("");
+  const t=[["kb","Khai báo"],["ds","Danh sách"]];
+  if(canApprove(ME.chucVu))t.push(["pd","Phê duyệt"]);
+  t.push(["budget","Ngân sách"],["nv","Nhân viên"]);
+  $("tabs").innerHTML=t.map(([k,l])=>`<div class="tab${k==="kb"?" active":""}" data-k="${k}" onclick="switchTab('${k}')">${l}</div>`).join("");
 }
 function switchTab(k){
   document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x.dataset.k===k));
-  ["dash","kb","ds","pd","budget"].forEach(x=>$("tab-"+x).classList.toggle("hidden",x!==k));
+  ["kb","ds","pd","budget","nv"].forEach(x=>$("tab-"+x).classList.toggle("hidden",x!==k));
   renderAll();
 }
 
 // ================= AUTOCOMPLETE =================
 function acNV(v){
-  v=v.trim().toLowerCase();
-  const u=v?findUser(v):null;
-  if(u){ $("f-chucvu").value = u.role==="NV"?"CHT-NVCH":(u.role==="QLKV"?"QLKV":(u.role==="GĐV"?"GĐV":(u.role==="GĐM"?"GĐM":"HCV"))); }
+  v=v.trim().toLowerCase(); const box=$("nvSug");
+  if(!v){box.classList.add("hidden");return}
+  const hits=NVDB.filter(u=>u.maNV.toLowerCase().includes(v)||u.ten.toLowerCase().includes(v)).slice(0,20);
+  if(!hits.length){box.classList.add("hidden");return}
+  box.innerHTML=hits.map(u=>`<div class="sg" onclick="pickNV('${u.maNV}')"><span class="st">${u.maNV}</span> · ${u.ten}<div class="sub">Chức vụ: ${u.chucVu}</div></div>`).join("");
+  box.classList.remove("hidden");
+}
+function pickNV(ma){
+  const u=findNV(ma); if(!u)return;
+  $("f-manv").value=ma; $("f-hoten").value=u.ten; $("f-chucvu").value=u.chucVu;
+  $("nvSug").classList.add("hidden"); liveValid();
 }
 function acCH(v){
   v=v.trim().toLowerCase(); const box=$("chSug");
@@ -287,7 +309,7 @@ function validRules(km,soNgay,loai,chucVu,gdv,tong){
 }
 function liveValid(){
   const v=$("validBox"),km=+$("f-km").value||0,soNgay=+$("f-ngay").value||1,tong=calc();
-  const gdv=selCH?selCH.gdv:(ME?ME.ten:null);
+  const gdv=selCH?selCH.gdv:null;
   const r=validRules(km,soNgay,$("f-loai").value,$("f-chucvu").value,gdv,tong);
   if(!$("f-km").value){v.className="valid-box pass hidden";return}
   v.classList.remove("hidden");
@@ -300,8 +322,8 @@ function calc(){const ctp=+$("f-ctp").value||0,ks=+$("f-ks").value||0,x=+$("f-xa
 // ================= SUBMIT =================
 function submitKB(){
   const manv=$("f-manv").value.trim(), mach=$("f-mach").value.trim();
-  if(!manv){toast("Vui lòng nhập Mã NV");return}
-  if(!selCH||!mach){toast("Vui lòng chọn Mã CH (cửa hàng)");return}
+  if(!mach||!selCH){toast("Bước 1: gõ Mã CH trước");return}
+  if(!manv){toast("Bước 2: nhập Mã NV (người công tác)");return}
   const loai=$("f-loai").value, den=$("f-den").value.trim();
   const km=+$("f-km").value||0, soNgay=+$("f-ngay").value||1;
   const ctp=+$("f-ctp").value||0, ks=+$("f-ks").value||0, x=+$("f-xang").value||0, tong=ctp+ks+x;
@@ -309,18 +331,18 @@ function submitKB(){
   if(!tong){toast("Vui lòng nhập chi phí");return}
   const chucVu=$("f-chucvu").value;
   const r=validRules(km,soNgay,loai,chucVu,selCH.gdv,tong);
-  const u=findUser(manv);
+  const u=findNV(manv);
   let status="cho_gdv";
-  if(ME.role==="GĐV")status=(soNgay>2||km>80)?"cho_gdm":"done";
-  if(["GĐM","ADMIN"].includes(ME.role))status="done";
-  const rec={id:Date.now(),maNV:manv,ten:(u&&u.ten)||manv,role:ME.role,chucVu,
+  if(ME.chucVu==="GĐV")status=(soNgay>2||km>80)?"cho_gdm":"done";
+  if(["GĐM","ADMIN"].includes(ME.chucVu))status="done";
+  const rec={id:Date.now(),maNV:manv,ten:(u&&u.ten)||$("f-hoten").value||manv,chucVu,
     maCH:selCH.ma,tenCH:selCH.ten,gdv:selCH.gdv,mien:selCH.mien,tinh:selCH.tinh,qlkv:selCH.qlkv,
     loai,den,km,soNgay,ngayDi:$("f-ngaydi").value,
     ctp,ks,xang:x,tong,ghiChu:$("f-ghichu").value.trim(),
     trangThai:status,ngayTao:new Date().toISOString().slice(0,16).replace("T"," "),validWarn:r.w};
   RECORDS.unshift(rec);saveRecords(RECORDS);
   toast("✅ Đã gửi khai báo ("+ST_LABEL[status]+")");
-  ["f-manv","f-mach","f-den","f-km","f-ngay","f-ctp","f-ks","f-xang","f-ghichu","f-ngaydi"].forEach(i=>$(i).value="");
+  ["f-mach","f-manv","f-hoten","f-den","f-km","f-ngay","f-ctp","f-ks","f-xang","f-ghichu","f-ngaydi"].forEach(i=>$(i).value="");
   $("f-ngay").value=1;$("f-loai").value="Hỗ trợ NSO";$("f-tong").textContent="0 đ";
   $("chInfo").classList.add("hidden");selCH=null;
   $("validBox").className="valid-box pass hidden";
@@ -330,7 +352,7 @@ function submitKB(){
 // ================= APPROVE =================
 function approve(id){
   const r=RECORDS.find(x=>x.id===id);if(!r)return;
-  if(ME.role==="GĐV"){
+  if(ME.chucVu==="GĐV"){
     if(r.km>80||r.soNgay>2||(r.validWarn&&r.validWarn.length)){r.trangThai="cho_gdm";toast("Đã chuyển GĐM duyệt")}
     else{r.trangThai="done";toast("✅ Đã duyệt")}
   }else{r.trangThai="done";toast("✅ Đã duyệt hoàn tất")}
@@ -341,27 +363,33 @@ function reject(id){
   const r=RECORDS.find(x=>x.id===id);r.trangThai="tu_choi";r.lyDo=l;saveRecords(RECORDS);renderAll();
 }
 
+// ================= NV DB =================
+function addNV(){
+  const ma=$("nv-ma").value.trim(), ten=$("nv-ten").value.trim(), cv=$("nv-cv").value;
+  if(!ma||!ten){toast("Nhập đủ Mã NV + Họ tên");return}
+  const i=NVDB.findIndex(u=>u.maNV.toLowerCase()===ma.toLowerCase());
+  if(i>=0){NVDB[i]={maNV:ma,ten,chucVu:cv}}
+  else{NVDB.push({maNV:ma,ten,chucVu:cv})}
+  saveNV(NVDB); ["nv-ma","nv-ten"].forEach(x=>$(x).value="");
+  toast("✅ Đã lưu nhân viên"); renderNV();
+}
+function delNV(ma){NVDB=NVDB.filter(u=>u.maNV!==ma);saveNV(NVDB);renderNV()}
+function renderNV(){
+  $("listNV").innerHTML=NVDB.map(u=>`<div class="item"><div class="top"><div><div class="name">${u.ten} <span style="font-weight:400;font-size:12px;color:var(--muted)">(${u.maNV})</span></div>
+    <div class="meta">Chức vụ: ${u.chucVu}</div></div>
+    <button class="btn danger" style="width:auto;padding:7px 12px" onclick="delNV('${u.maNV}')">Xóa</button></div></div>`).join("");
+}
+
 // ================= RENDER =================
-function renderAll(){renderKpi();renderBudget();renderDS();renderPD();renderMyBudget()}
+function renderAll(){renderKpi();renderBudget();renderDS();renderPD();renderNV()}
 function renderKpi(){
-  const mine=RECORDS.filter(r=>ME.role==="GĐV"?r.gdv===ME.ten:true);
+  const mine=RECORDS.filter(r=>ME.chucVu==="GĐV"?r.gdv===ME.ten:true);
   const pending=mine.filter(r=>["cho_gdv","cho_gdm"].includes(r.trangThai)).length;
   const done=mine.filter(r=>r.trangThai==="done").length;
   const total=mine.filter(r=>r.trangThai==="done").reduce((s,r)=>s+r.tong,0);
-  $("kpis").innerHTML=`
-    <div class="kpi"><div class="v">${mine.length}</div><div class="l">Khai báo</div></div>
+  $("kpis").innerHTML=`<div class="kpi"><div class="v">${mine.length}</div><div class="l">Khai báo</div></div>
     <div class="kpi warn"><div class="v">${pending}</div><div class="l">Chờ duyệt</div></div>
     <div class="kpi ok"><div class="v">${fmtTr(total/1e6)}<small>tr</small></div><div class="l">Đã duyệt</div></div>`;
-}
-function renderMyBudget(){
-  const gdv = (ME.role==="GĐV")?ME.ten:null;
-  if(!gdv){$("myBudget").innerHTML='<div class="empty">Chọn Mã CH khi khai báo để xem ngân sách GĐV tương ứng. GĐM/Admin xem ở tab "Ngân sách".</div>';return}
-  const b=gdvBudget(gdv);if(!b){$("myBudget").innerHTML='<div class="empty">Chưa có ngân sách cho GĐV này.</div>';return}
-  const used=usedBudget(gdv),rem=b.budget*1e6-used,pct=used/(b.budget*1e6)*100,over=pct>100;
-  $("myBudget").innerHTML=`
-    <div style="font-size:13px;color:#555">Tổng: <b>${fmtTr(b.budget)} tr</b> · Đã dùng: <b>${fmtTr(used/1e6)} tr</b> · Còn: <b style="color:${over?'var(--err)':'var(--ok)'}">${fmtTr(rem/1e6)} tr</b></div>
-    <div class="prog ${over?'over':''}"><div style="width:${Math.min(pct,100)}%"></div></div>
-    <div style="font-size:11.5px;color:var(--muted);margin-top:5px">${fmtTr(pct)}% ngân sách đã dùng</div>`;
 }
 function renderBudget(){
   $("listBudget").innerHTML=GDV_BUDGET.map(g=>{
@@ -374,7 +402,7 @@ function renderBudget(){
 }
 function itemHtml(r,showActs){
   const st=ST_LABEL[r.trangThai]||r.trangThai, cls=ST_CLASS[r.trangThai]||"b-wait";
-  return `<div class="item"><div class="top"><div><div class="name">${r.ten} <span style="font-weight:400;font-size:12px;color:var(--muted)">(${r.chucVu||r.role})</span></div>
+  return `<div class="item"><div class="top"><div><div class="name">${r.ten} <span style="font-weight:400;font-size:12px;color:var(--muted)">(${r.chucVu})</span></div>
     <div class="meta">${r.loai} · ${r.tenCH||r.maCH} → ${r.den||"—"} · ${r.km}km · ${r.soNgay} ngày · ${r.ngayTao}</div>
     <div class="meta">GĐV: ${r.gdv||"—"} · Miền: ${r.mien||"—"}</div></div>
     <div style="text-align:right"><div class="money">${fmt(r.tong)}</div><span class="badge ${cls}">${st}</span></div></div>
@@ -383,14 +411,14 @@ function itemHtml(r,showActs){
     ${showActs&&["cho_gdv","cho_gdm"].includes(r.trangThai)?`<div class="acts"><button class="btn ok" onclick="approve(${r.id})">Duyệt</button><button class="btn danger" onclick="reject(${r.id})">Từ chối</button></div>`:""}</div>`;
 }
 function renderDS(){
-  const mine=RECORDS.filter(r=>ME.role==="GĐV"?r.gdv===ME.ten:true);
+  const mine=RECORDS.filter(r=>ME.chucVu==="GĐV"?r.gdv===ME.ten:true);
   if(!mine.length){$("listDS").innerHTML='<div class="empty">Chưa có khai báo nào.</div>';return}
   $("listDS").innerHTML=mine.map(r=>itemHtml(r,false)).join("");
 }
 function renderPD(){
-  if(!["GĐV","GĐM","ADMIN"].includes(ME.role)){$("listPD").innerHTML='<div class="empty">Chỉ GĐV/GĐM mới phê duyệt.</div>';return}
+  if(!canApprove(ME.chucVu)){$("listPD").innerHTML='<div class="empty">Chỉ GĐV/GĐM mới phê duyệt.</div>';return}
   let pool=RECORDS;
-  if(ME.role==="GĐV")pool=pool.filter(r=>r.gdv===ME.ten&&r.trangThai==="cho_gdv");
+  if(ME.chucVu==="GĐV")pool=pool.filter(r=>r.gdv===ME.ten&&r.trangThai==="cho_gdv");
   else pool=pool.filter(r=>["cho_gdm","cho_gdv"].includes(r.trangThai));
   if(!pool.length){$("listPD").innerHTML='<div class="empty">Không có phiếu chờ duyệt.</div>';return}
   $("listPD").innerHTML=pool.map(r=>itemHtml(r,true)).join("");
