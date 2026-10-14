@@ -219,7 +219,7 @@ const DEFAULT_NV = [
 ];
 
 let STORELIST = [];
-fetch('storelist.json').then(r=>r.json()).then(d=>{STORELIST=d}).catch(e=>console.log('storelist load fail'));
+fetch('storelist.json?v=4').then(r=>r.json()).then(d=>{STORELIST=d}).catch(e=>console.log('storelist load fail'));
 
 const STORE_KEY="ctp_records_v3", SESSION_KEY="ctp_session_v3", NV_KEY="ctp_nvdb_v1";
 function loadRecords(){try{return JSON.parse(localStorage.getItem(STORE_KEY))||[]}catch(e){return[]}}
