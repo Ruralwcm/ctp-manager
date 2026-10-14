@@ -132,7 +132,9 @@
       <div class="fld"><label>Loại công tác</label>
         <select id="f-loai"><option>Hỗ trợ NSO</option><option>Hỗ trợ CH</option><option>Checklist CH</option><option>Họp / Đào tạo</option><option>Khác</option></select></div>
       <div class="row">
-        <div class="fld"><label>Điểm đến (NSO/CH)</label><input id="f-den" placeholder="NSO / tỉnh đến"></div>
+        <div class="fld auto-wrap"><label>Điểm đến (NSO/CH)</label>
+          <input id="f-den" placeholder="Gõ mã/tên CH hoặc NSO đến..." autocomplete="off" oninput="acDen(this.value)">
+          <div class="suggest hidden" id="denSug"></div></div>
         <div class="fld"><label>Khoảng cách (km)</label><input id="f-km" type="number" placeholder="45" oninput="liveValid()"></div>
       </div>
       <div class="row">
@@ -293,6 +295,18 @@ function pickCH(ma){
   $("chInfo").classList.remove("hidden");
   $("chInfo").innerHTML=`<b>${selCH.ten}</b><br>GĐV: <b>${selCH.gdv||"—"}</b> · Miền: <b>${selCH.mien||"—"}</b><br>Tỉnh: ${selCH.tinh||"—"} · QLKV: ${selCH.qlkv||"—"}`;
   liveValid();
+}
+function acDen(v){
+  v=v.trim().toLowerCase(); const box=$("denSug");
+  if(!v||!STORELIST.length){box.classList.add("hidden");return}
+  const hits=STORELIST.filter(s=>s.ma.toLowerCase().includes(v)||s.ten.toLowerCase().includes(v)).slice(0,25);
+  if(!hits.length){box.classList.add("hidden");return}
+  box.innerHTML=hits.map(s=>`<div class="sg" onclick="pickDen('${s.ma}')"><span class="st">${s.ma}</span> · ${s.ten}<div class="sub">${s.gdv||"—"} · ${s.mien||"—"} · ${s.tinh||"—"}</div></div>`).join("");
+  box.classList.remove("hidden");
+}
+function pickDen(ma){
+  const s=STORELIST.find(x=>x.ma===ma); if(!s)return;
+  $("f-den").value=s.ten; $("denSug").classList.add("hidden");
 }
 
 // ================= VALID =================
